@@ -1,0 +1,10 @@
+<launch>
+        <!-- <node pkg="modify_stdr_scan" type="modify_stdr_scan_deprecated.py" name="modify_stdr_scan" output="screen" /> -->
+
+	<!-- this is the C++ one -->
+	<arg name="robot_namespace" />
+        <!-- node pkg="modify_stdr_scan" type="modify_stdr_scan" name="modify_stdr_scan" output="screen" -->	
+</launch>
+
+
+

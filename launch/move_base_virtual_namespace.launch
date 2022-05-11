@@ -1,0 +1,36 @@
+<launch>
+  <!-- Namespace and tf_prefix are assumed to be the same -->
+  <arg name="robot_namespace"/>
+  <arg name="obstx"/>
+  <arg name="obsty"/>
+  <arg name="global_planning_freq" default="$(optenv GM_PARAM_GLOBAL_PLANNING_FREQ 1)"/>
+  <arg name="controller_freq" default="$(optenv GM_PARAM_CONTROLLER_FREQ 5)"/>
+
+  <!-- spawn obstacles -->
+  <node pkg="stdr_robot" type="robot_handler" name="$(arg robot_namespace)" args="add $(find potential_gap)/stdr_robots/robots/holonomic_robot_360_bumper.xml $(arg obstx) $(arg obsty) 0" />
+
+  <group ns="$(arg robot_namespace)">
+	<!-- THIS COMMAND WILL WORK FOR SEVERAL ROBOTS. GIVES ERROR THAT GOAL POSE PASSED TO PLANNER MUST BE IN KNOWN_MAP FRAME (IN CODE IT IS IN MAP_STATIC FRAME), BUT ROBOTS STILL MOVE -->
+	<node pkg="move_base_virtual" type="move_base_virtual" respawn="false" name="move_base_virtual" output="screen" clear_params="true">
+	        <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+
+		<rosparam file="$(find dynamic_gap)/config/common_costmap_params.yaml" command="load" ns="global_costmap"/>
+		<rosparam file="$(find dynamic_gap)/config/common_costmap_params.yaml" command="load" ns="local_costmap"/>
+		<rosparam file="$(find dynamic_gap)/config/local_costmap_params.yaml" command="load"/>
+		<rosparam file="$(find dynamic_gap)/config/global_costmap_params.yaml" command="load"/>
+
+		<rosparam file="$(find nav_configs)/config/move_base_params.yaml" command="load"/>
+	        <rosparam file="$(find nav_configs)/config/dwa_local_planner_params.yaml" command="load" />
+
+		<param name="global_costmap/obstacle_layer/scan/topic" value="$(arg robot_namespace)/laser_0"/>
+		<param name="local_costmap/obstacle_layer/scan/topic" value="$(arg robot_namespace)/laser_0"/>
+	    	<param name="global_costmap/robot_base_frame" value="$(arg robot_namespace)"/>
+	    	<param name="local_costmap/robot_base_frame" value="$(arg robot_namespace)"/>
+		<param name="controller_frequency" value="$(arg controller_freq)" />
+		<param name="planner_frequency" value="$(arg global_planning_freq)"/>
+
+	    	<remap from="map" to="/map" />
+	</node>
+  </group>
+  
+</launch>

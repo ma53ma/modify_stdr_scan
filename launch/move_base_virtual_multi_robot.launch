@@ -1,0 +1,14 @@
+<launch>
+  <include file="$(find modify_stdr_scan)/launch/move_base_virtual_namespace.launch">
+  <arg name="robot_namespace" value="robot0" />
+  </include>
+
+  <include file="$(find modify_stdr_scan)/launch/move_base_virtual_namespace.launch">
+  <arg name="robot_namespace" value="robot1" />
+  </include>
+
+  <include file="$(find modify_stdr_scan)/launch/move_base_virtual_namespace.launch">
+  <arg name="robot_namespace" value="robot2" />
+  </include>
+
+</launch>	

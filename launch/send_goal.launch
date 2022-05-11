@@ -1,0 +1,41 @@
+<launch>
+
+	<include file="$(find modify_stdr_scan)/launch/stdr_world.launch" />
+
+	<include file="$(find modify_stdr_scan)/launch/move_base_virtual_multi_robot.launch" />
+
+	<!-- THIS COMMAND WILL MOVE ONE ROBOT. GIVES ERROR THAT GOAL POSE PASSED TO PLANNER MUST BE IN KNOWN_MAP FRAME (IN CODE IT IS IN MAP_STATIC FRAME), BUT ROBOT STILL MOVES -->
+	<!-- 	
+	<arg name="robot_namespace" default="robot0"/>
+	<group ns="$(arg robot_namespace)">
+		<node pkg="move_base_virtual" type="move_base_virtual" respawn="false" name="move_base_virtual" output="screen" clear_params="true">
+		        <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+
+			<rosparam file="$(find potential_gap)/config/common_costmap_params.yaml" command="load" ns="global_costmap"/>
+			<rosparam file="$(find potential_gap)/config/common_costmap_params.yaml" command="load" ns="local_costmap"/>
+			<rosparam file="$(find potential_gap)/config/local_costmap_params.yaml" command="load"/>
+			<rosparam file="$(find potential_gap)/config/global_costmap_params.yaml" command="load"/>
+
+			<rosparam file="$(find nav_configs)/config/move_base_params.yaml" command="load"/>
+		        <rosparam file="$(find nav_configs)/config/dwa_local_planner_params.yaml" command="load" />
+
+
+			<param name="controller_frequency" value="$(arg controller_freq)" />
+			<param name="planner_frequency" value="$(arg global_planning_freq)"/>
+
+		    	<param name="controller_frequency" value="10.0" />
+		    	<param name="global_costmap/robot_base_frame" value="robot0"/>
+		    	<param name="local_costmap/robot_base_frame" value="robot0"/>
+		    	<param name="local_costmap/global_frame" value="known_map"/>
+
+		    	<remap from="map" to="/map" />
+	      	    	<remap from="cmd_vel" to="/robot0/cmd_vel" />
+	     	    	<remap from="/odom" to="/robot0/odom" />
+		</node>
+	</group>
+	-->
+
+    	<node pkg="modify_stdr_scan" type="send_goal.py" name="send_goal" output="screen" />
+
+</launch>
+
