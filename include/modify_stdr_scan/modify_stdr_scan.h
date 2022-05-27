@@ -24,6 +24,7 @@ class StdrScanModifier {
         ros::Publisher modified_scan_pub;
         ros::Publisher modified_bumper_pub;
         ros::Publisher marker_ego_pub;
+        ros::Publisher marker1_pub;
 
     public:
         StdrScanModifier(int n, ros::NodeHandle nh, double _robot_radius);

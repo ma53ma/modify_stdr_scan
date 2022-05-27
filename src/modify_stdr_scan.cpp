@@ -20,7 +20,7 @@ StdrScanModifier::StdrScanModifier(int n, ros::NodeHandle nh, double _robot_radi
     modified_scan_pub = nh.advertise<sensor_msgs::LaserScan>("/robot" + to_string(n) + "/mod_laser_0", 1);
     modified_bumper_pub = nh.advertise<sensor_msgs::Range>("/robot" + to_string(n) + "/mod_bumpers", 1); 
     marker_ego_pub = nh.advertise<visualization_msgs::Marker>("/robot" + to_string(n) + "/marker", 1);
-    //marker1_pub = nh.advertise<visualization_msgs::Marker>("/robot1/marker", 1);
+    marker1_pub = nh.advertise<visualization_msgs::Marker>("/robot1/marker", 1);
     //marker2_pub = nh.advertise<visualization_msgs::Marker>("/robot2/marker", 1);
 }
 
@@ -63,15 +63,9 @@ void StdrScanModifier::other_odom_callback(const nav_msgs::Odometry::ConstPtr& m
     string check = msg->child_frame_id;
     // cout << "check " << check << endl;
     
-    /*
-    if (check.compare("robot0") == 0) {
-        // cout << "in robot 0" << endl;
-        publish_marker(marker0_pub, msg, color);
-    } else if (check.compare("robot1") == 0) {
-        // cout << "in robot 1" << endl;
-        publish_marker(marker1_pub, msg, color);
-    }
-    */
+    
+    
+    publish_marker(marker1_pub, msg, color);
     
 }
 
