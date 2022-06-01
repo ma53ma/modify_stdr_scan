@@ -22,8 +22,31 @@ StdrScanModifier::StdrScanModifier(int n, ros::NodeHandle nh, double _robot_radi
     modified_scan_pub = nh.advertise<sensor_msgs::LaserScan>("/robot" + to_string(n) + "/mod_laser_0", 1);
     modified_bumper_pub = nh.advertise<sensor_msgs::Range>("/robot" + to_string(n) + "/mod_bumpers", 1); 
     marker_ego_pub = nh.advertise<visualization_msgs::Marker>("/robot" + to_string(n) + "/marker", 1);
+    marker0_pub = nh.advertise<visualization_msgs::Marker>("/robot0/marker", 1);
     marker1_pub = nh.advertise<visualization_msgs::Marker>("/robot1/marker", 1);
-    //marker2_pub = nh.advertise<visualization_msgs::Marker>("/robot2/marker", 1);
+    marker2_pub = nh.advertise<visualization_msgs::Marker>("/robot2/marker", 1);
+    marker3_pub = nh.advertise<visualization_msgs::Marker>("/robot3/marker", 1);
+    marker4_pub = nh.advertise<visualization_msgs::Marker>("/robot4/marker", 1);
+    marker5_pub = nh.advertise<visualization_msgs::Marker>("/robot5/marker", 1);
+    marker6_pub = nh.advertise<visualization_msgs::Marker>("/robot6/marker", 1);
+    marker7_pub = nh.advertise<visualization_msgs::Marker>("/robot7/marker", 1);
+    marker8_pub = nh.advertise<visualization_msgs::Marker>("/robot8/marker", 1);
+    marker9_pub = nh.advertise<visualization_msgs::Marker>("/robot9/marker", 1);
+    marker10_pub = nh.advertise<visualization_msgs::Marker>("/robot10/marker", 1);
+    marker11_pub = nh.advertise<visualization_msgs::Marker>("/robot11/marker", 1);
+    marker12_pub = nh.advertise<visualization_msgs::Marker>("/robot12/marker", 1);
+    marker13_pub = nh.advertise<visualization_msgs::Marker>("/robot13/marker", 1);
+    marker14_pub = nh.advertise<visualization_msgs::Marker>("/robot14/marker", 1);
+    marker15_pub = nh.advertise<visualization_msgs::Marker>("/robot15/marker", 1);
+    marker16_pub = nh.advertise<visualization_msgs::Marker>("/robot16/marker", 1);
+    marker17_pub = nh.advertise<visualization_msgs::Marker>("/robot17/marker", 1);
+    marker18_pub = nh.advertise<visualization_msgs::Marker>("/robot18/marker", 1);
+    marker19_pub = nh.advertise<visualization_msgs::Marker>("/robot19/marker", 1);
+    marker20_pub = nh.advertise<visualization_msgs::Marker>("/robot20/marker", 1);
+    marker21_pub = nh.advertise<visualization_msgs::Marker>("/robot21/marker", 1);
+    marker22_pub = nh.advertise<visualization_msgs::Marker>("/robot22marker", 1);
+    marker23_pub = nh.advertise<visualization_msgs::Marker>("/robot23/marker", 1);
+    marker24_pub = nh.advertise<visualization_msgs::Marker>("/robot24/marker", 1);    
 }
 
 void StdrScanModifier::ego_odom_callback(const nav_msgs::Odometry::ConstPtr& msg) {
@@ -65,10 +88,32 @@ void StdrScanModifier::other_odom_callback(const nav_msgs::Odometry::ConstPtr& m
     string check = msg->child_frame_id;
     // cout << "check " << check << endl;
     
-    
-    
-    publish_marker(marker1_pub, msg, color);
-    
+    if (check == "robot0") { publish_marker(marker0_pub, msg, color);
+    } else if (check == "robot1") { publish_marker(marker1_pub, msg, color);
+    } else if (check == "robot2") { publish_marker(marker2_pub, msg, color);
+    } else if (check == "robot3") { publish_marker(marker3_pub, msg, color);
+    } else if (check == "robot4") { publish_marker(marker4_pub, msg, color);
+    } else if (check == "robot5") { publish_marker(marker5_pub, msg, color);
+    } else if (check == "robot6") { publish_marker(marker6_pub, msg, color);
+    } else if (check == "robot7") { publish_marker(marker7_pub, msg, color);
+    } else if (check == "robot8") { publish_marker(marker8_pub, msg, color);
+    } else if (check == "robot9") { publish_marker(marker9_pub, msg, color);
+    } else if (check == "robot10") { publish_marker(marker10_pub, msg, color);
+    } else if (check == "robot11") { publish_marker(marker11_pub, msg, color);
+    } else if (check == "robot12") { publish_marker(marker12_pub, msg, color);
+    } else if (check == "robot13") { publish_marker(marker13_pub, msg, color);
+    } else if (check == "robot14") { publish_marker(marker14_pub, msg, color);
+    } else if (check == "robot15") { publish_marker(marker15_pub, msg, color);
+    } else if (check == "robot16") { publish_marker(marker16_pub, msg, color);
+    } else if (check == "robot17") { publish_marker(marker17_pub, msg, color);
+    } else if (check == "robot18") { publish_marker(marker18_pub, msg, color);
+    } else if (check == "robot19") { publish_marker(marker19_pub, msg, color);
+    } else if (check == "robot20") { publish_marker(marker20_pub, msg, color);
+    } else if (check == "robot21") { publish_marker(marker21_pub, msg, color);
+    } else if (check == "robot22") { publish_marker(marker22_pub, msg, color);
+    } else if (check == "robot23") { publish_marker(marker23_pub, msg, color);
+    } else if (check == "robot24") { publish_marker(marker24_pub, msg, color);
+    }    
 }
 
 void StdrScanModifier::publish_marker(ros::Publisher publisher, const nav_msgs::Odometry::ConstPtr& msg, float color[]) {
@@ -150,7 +195,7 @@ void StdrScanModifier::ego_scan_callback(const sensor_msgs::LaserScan::ConstPtr&
 
             vector<double> centered_pt1{pt1[0] - other_state[0],
                                         pt1[1] - other_state[1]};
-            if (centered_pt1.norm() > max_range)
+            if (sqrt(pow(centered_pt1[0], 2) + pow(centered_pt1[1], 2)) > max_range)
                 continue;
 
             vector<double> centered_pt2{pt2[0] - other_state[0],
