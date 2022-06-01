@@ -160,8 +160,57 @@ double l2_norm(vector<double> const& u) {
     }
     return sqrt(accum);
 }
+
+struct Comparator {
+    Comparator(vector<float> _pt1) {this->pt1 = _pt1;}
+
+    bool operator() (pair<string, vector<double>>& a, pair<string, vector<double>>& b) {
+        double a_dist = pow(pt1[0] - a.second[0], 2) + pow(pt1[1] - a.second[1], 2);
+        double b_dist = pow(pt1[0] - b.second[0], 2) + pow(pt1[1] - b.second[1], 2);
+        return a_dist < b_dist;
+    }
+
+    vector<float> pt1;
+};
+
+vector<pair<string, vector<double> >> StdrScanModifier::sort_and_prune(map<string, vector<double>>& M)
+{
+  
+    // Declare vector of pairs
+    vector<pair<string, vector<double> >> A;
+    
+    // Copy key-value pair from Map
+    // to vector of pairs
+    double dist;
+    for (auto& it : M) {
+        // ROS_INFO_STREAM(it.first);
+        //ROS_INFO_STREAM("pose: " << std::to_string(it.second[0]) << ", " << std::to_string(it.second[1]));
+        //ROS_INFO_STREAM("ego pose: " << pt1[0] << ", " << pt1[1]);
+        dist = sqrt(pow(pt1[0] - it.second[0], 2) + pow(pt1[1] - it.second[1], 2));
+        //ROS_INFO_STREAM("dist: " << dist);
+        if (dist < max_range) {
+            A.push_back(it);
+        }
+    }
+    
+    // Sort using comparator function
+    sort(A.begin(), A.end(), Comparator(pt1));
+    
+    // ROS_INFO_STREAM("printing pruned vect");
+    // Print the sorted value
+    /*
+    for (auto& it : A) {
+  
+        ROS_INFO_STREAM(it.first << ' ' << it.second[0] << ", " << it.second[1]);
+    }
+    */
+    
+
+    return A;
+}
  
 void StdrScanModifier::ego_scan_callback(const sensor_msgs::LaserScan::ConstPtr& msg) {
+    // double start_time = ros::Time::now().toSec();
     sensor_msgs::LaserScan modified_laser_scan;
     modified_laser_scan.header = msg->header;
     modified_laser_scan.angle_min = msg->angle_min;
@@ -187,19 +236,22 @@ void StdrScanModifier::ego_scan_callback(const sensor_msgs::LaserScan::ConstPtr&
         vector<float> pt2{pt1[0] + lidar_range[0],
                           pt1[1] + lidar_range[1]};
 
-        map<string, vector<double>>::iterator it;
-        
+        // map<string, vector<double>>::iterator it;
+        vector<pair<string, vector<double> >> odom_vect = sort_and_prune(odom_map);
         // TODO: sort map here according to distance from robot. Then, can break after first intersection
-        for (it = odom_map.begin(); it != odom_map.end(); it++) {
-            vector<double> other_state = it->second;
+        for (int j = 0; j < odom_vect.size(); j++) {
+            vector<double> other_state = odom_vect[j].second;
+            // ROS_INFO_STREAM("ODOM MAP SECOND: " << other_state[0] << ", " << other_state[1]);
+            // int idx_dist = std::distance(odom_map.begin(), it);
+            // ROS_INFO_STREAM("EGO ROBOT ODOM: " << pt1[0] << ", " << pt1[1]);
+            // ROS_INFO_STREAM("ODOM VECT SECOND: " << other_state[0] << ", " << other_state[1]);
 
             vector<double> centered_pt1{pt1[0] - other_state[0],
                                         pt1[1] - other_state[1]};
-            if (sqrt(pow(centered_pt1[0], 2) + pow(centered_pt1[1], 2)) > max_range)
-                continue;
 
             vector<double> centered_pt2{pt2[0] - other_state[0],
                                         pt2[1] - other_state[1]};
+            // ROS_INFO_STREAM("LASER SCAN PT: " << pt2[0] << ", " << pt2[1]);
 
             double dx = centered_pt2[0] - centered_pt1[0];
             double dy = centered_pt2[1] - centered_pt1[1];
@@ -226,19 +278,17 @@ void StdrScanModifier::ego_scan_callback(const sensor_msgs::LaserScan::ConstPtr&
                 if (dist0 < dist1) {
                     vector<double> int0_min_cent_pt2{intersection0[0] - centered_pt2[0],
                                                      intersection0[1] - centered_pt2[1]};
-                    if (dist0 < modified_laser_scan.ranges[i] && 
-                        dist0 < l2_norm(cent_pt2_min_cent_pt1) && 
-                        l2_norm(int0_min_cent_pt2) < l2_norm(cent_pt2_min_cent_pt1)) {
-                            
+                    if (dist0 < modified_laser_scan.ranges[i] && dist0 < l2_norm(cent_pt2_min_cent_pt1) && l2_norm(int0_min_cent_pt2) < l2_norm(cent_pt2_min_cent_pt1)) {
+                        // ROS_INFO_STREAM("changed distance from " << modified_laser_scan.ranges[i] << " to " << dist0);
                         modified_laser_scan.ranges[i] = dist0;
+                        break;
                     }
                 } else {
-                    vector<double> int1_min_cent_pt2{intersection1[0] - centered_pt2[0],
-                                                 intersection1[1] - centered_pt2[1]};
-                    if (dist1 < modified_laser_scan.ranges[i] && 
-                        dist1 < l2_norm(cent_pt2_min_cent_pt1) && 
-                        l2_norm(int1_min_cent_pt2) < l2_norm(cent_pt2_min_cent_pt1)) {
+                    vector<double> int1_min_cent_pt2{intersection1[0] - centered_pt2[0], intersection1[1] - centered_pt2[1]};
+                    if (dist1 < modified_laser_scan.ranges[i] && dist1 < l2_norm(cent_pt2_min_cent_pt1) && l2_norm(int1_min_cent_pt2) < l2_norm(cent_pt2_min_cent_pt1)) {
+                        // ROS_INFO_STREAM("changed distance from " << modified_laser_scan.ranges[i] << " to " << dist1);                        
                         modified_laser_scan.ranges[i] = dist1;
+                        break;
                     }
                 }
             }
@@ -246,6 +296,7 @@ void StdrScanModifier::ego_scan_callback(const sensor_msgs::LaserScan::ConstPtr&
         
     }
 
+    // ROS_INFO_STREAM("time taken: " << ros::Time::now().toSec() - start_time);
     // cout << "modified scan publish" << endl;
     modified_scan_pub.publish(modified_laser_scan);
 }

@@ -40,4 +40,7 @@ class StdrScanModifier {
         void publish_marker(ros::Publisher publisher, const nav_msgs::Odometry::ConstPtr& msg, float color[]);
         int sgn_star(float dy);
         void ego_scan_callback(const sensor_msgs::LaserScan::ConstPtr& msg);
+        // bool cmp(pair<string, vector<double>>& a, pair<string, vector<double>>& b);     
+        vector<pair<string, vector<double> >> sort_and_prune(map<string, vector<double>>& M);
+
 };
