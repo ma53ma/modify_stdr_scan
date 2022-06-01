@@ -20,6 +20,7 @@ class StdrScanModifier {
         float x_obs;
         float y_obs;
         float theta_obs;
+        float max_range;
         vector<float> pt1;
         ros::Publisher modified_scan_pub;
         ros::Publisher modified_bumper_pub;

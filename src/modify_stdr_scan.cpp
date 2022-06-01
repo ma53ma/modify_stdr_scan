@@ -17,6 +17,8 @@ StdrScanModifier::StdrScanModifier(int n, ros::NodeHandle nh, double _robot_radi
     pt1.push_back(x_obs);
     pt1.push_back(y_obs);
 
+    max_range = 5.0;
+
     modified_scan_pub = nh.advertise<sensor_msgs::LaserScan>("/robot" + to_string(n) + "/mod_laser_0", 1);
     modified_bumper_pub = nh.advertise<sensor_msgs::Range>("/robot" + to_string(n) + "/mod_bumpers", 1); 
     marker_ego_pub = nh.advertise<visualization_msgs::Marker>("/robot" + to_string(n) + "/marker", 1);
@@ -148,6 +150,8 @@ void StdrScanModifier::ego_scan_callback(const sensor_msgs::LaserScan::ConstPtr&
 
             vector<double> centered_pt1{pt1[0] - other_state[0],
                                         pt1[1] - other_state[1]};
+            if (centered_pt1.norm() > max_range)
+                continue;
 
             vector<double> centered_pt2{pt2[0] - other_state[0],
                                         pt2[1] - other_state[1]};
