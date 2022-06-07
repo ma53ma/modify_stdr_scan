@@ -210,7 +210,7 @@ vector<pair<string, vector<double> >> StdrScanModifier::sort_and_prune(map<strin
 }
  
 void StdrScanModifier::ego_scan_callback(const sensor_msgs::LaserScan::ConstPtr& msg) {
-    // double start_time = ros::Time::now().toSec();
+    double start_time = ros::Time::now().toSec();
     sensor_msgs::LaserScan modified_laser_scan;
     modified_laser_scan.header = msg->header;
     modified_laser_scan.angle_min = msg->angle_min;
@@ -220,17 +220,25 @@ void StdrScanModifier::ego_scan_callback(const sensor_msgs::LaserScan::ConstPtr&
     modified_laser_scan.range_max = msg->range_max;
     modified_laser_scan.ranges = msg->ranges;
 
+    auto min_dist = *std::min_element(msg->ranges.begin(), msg->ranges.end());
+    ROS_INFO_STREAM("before modify scan, min_dist: " << min_dist);
+
+
     for (int i = 0; i < modified_laser_scan.ranges.size(); i++) {
         float rad = msg->angle_min + i*msg->angle_increment;
         float dist;
         // cout << "i: " << i << " rad: " << rad << endl;
         // cout << "original distance " << modified_laser_scan.ranges[i] << endl;
+        modified_laser_scan.ranges[i] = std::min(modified_laser_scan.ranges[i], max_range);
+        /*
         if (isinf(modified_laser_scan.ranges[i])) {
             dist = msg->range_max;
         } else {
             dist = modified_laser_scan.ranges[i];
         }
-
+        */
+        dist = modified_laser_scan.ranges[i];
+        
         vector<float> lidar_range{dist*cos(rad + theta_obs), dist*sin(rad + theta_obs)};
 
         vector<float> pt2{pt1[0] + lidar_range[0],
@@ -296,7 +304,11 @@ void StdrScanModifier::ego_scan_callback(const sensor_msgs::LaserScan::ConstPtr&
         
     }
 
-    // ROS_INFO_STREAM("time taken: " << ros::Time::now().toSec() - start_time);
+    min_dist = *std::min_element(modified_laser_scan.ranges.begin(), modified_laser_scan.ranges.end());
+    ROS_INFO_STREAM("after modify scan, min_dist: " << min_dist);
+
+
+    ROS_INFO_STREAM("mod scan time taken: " << ros::Time::now().toSec() - start_time);
     // cout << "modified scan publish" << endl;
     modified_scan_pub.publish(modified_laser_scan);
 }
