@@ -336,7 +336,7 @@ int main(int argc, char **argv) {
 
     // cout << "setting up subscribers" << endl;
 
-    ros::Subscriber pose_sub = nh.subscribe("/robot" + to_string(n) + "/laser_0", 10, &StdrScanModifier::ego_scan_callback, &modifier);
+    ros::Subscriber pose_sub = nh.subscribe("/robot" + to_string(n) + "/laser_0", 3, &StdrScanModifier::ego_scan_callback, &modifier);
     ros::Subscriber ego_odom_sub = nh.subscribe("/robot" + to_string(n) + "/odom", 10, &StdrScanModifier::ego_odom_callback, &modifier);
     
     ros::Rate loop_rate(30);
