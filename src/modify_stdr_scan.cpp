@@ -210,7 +210,7 @@ vector<pair<string, vector<double> >> StdrScanModifier::sort_and_prune(map<strin
 }
  
 void StdrScanModifier::ego_scan_callback(const sensor_msgs::LaserScan::ConstPtr& msg) {
-    double start_time = ros::Time::now().toSec();
+    // double start_time = ros::Time::now().toSec();
     sensor_msgs::LaserScan modified_laser_scan;
     modified_laser_scan.header = msg->header;
     modified_laser_scan.angle_min = msg->angle_min;
@@ -221,7 +221,7 @@ void StdrScanModifier::ego_scan_callback(const sensor_msgs::LaserScan::ConstPtr&
     modified_laser_scan.ranges = msg->ranges;
 
     auto min_dist = *std::min_element(msg->ranges.begin(), msg->ranges.end());
-    ROS_INFO_STREAM("before modify scan, min_dist: " << min_dist);
+    // ROS_INFO_STREAM("before modify scan, min_dist: " << min_dist);
 
 
     for (int i = 0; i < modified_laser_scan.ranges.size(); i++) {
@@ -305,10 +305,10 @@ void StdrScanModifier::ego_scan_callback(const sensor_msgs::LaserScan::ConstPtr&
     }
 
     min_dist = *std::min_element(modified_laser_scan.ranges.begin(), modified_laser_scan.ranges.end());
-    ROS_INFO_STREAM("after modify scan, min_dist: " << min_dist);
+    // ROS_INFO_STREAM("after modify scan, min_dist: " << min_dist);
 
 
-    ROS_INFO_STREAM("mod scan time taken: " << ros::Time::now().toSec() - start_time);
+    // ROS_INFO_STREAM("mod scan time taken: " << ros::Time::now().toSec() - start_time);
     // cout << "modified scan publish" << endl;
     modified_scan_pub.publish(modified_laser_scan);
 }
@@ -330,14 +330,14 @@ int main(int argc, char **argv) {
     // std::cout << "n: " << n << std::endl;
 
     for (int i = 0; i < n; i++) {
-        ros::Subscriber temp_odom_sub = nh.subscribe("/robot" + to_string(i) + "/odom", 10, &StdrScanModifier::other_odom_callback, &modifier);
+        ros::Subscriber temp_odom_sub = nh.subscribe("/robot" + to_string(i) + "/odom", 1, &StdrScanModifier::other_odom_callback, &modifier);
         modifier.odom_subscribers.push_back(temp_odom_sub);
     }
 
     // cout << "setting up subscribers" << endl;
 
-    ros::Subscriber pose_sub = nh.subscribe("/robot" + to_string(n) + "/laser_0", 3, &StdrScanModifier::ego_scan_callback, &modifier);
-    ros::Subscriber ego_odom_sub = nh.subscribe("/robot" + to_string(n) + "/odom", 10, &StdrScanModifier::ego_odom_callback, &modifier);
+    ros::Subscriber pose_sub = nh.subscribe("/robot" + to_string(n) + "/laser_0", 1, &StdrScanModifier::ego_scan_callback, &modifier);
+    ros::Subscriber ego_odom_sub = nh.subscribe("/robot" + to_string(n) + "/odom", 1, &StdrScanModifier::ego_odom_callback, &modifier);
     
     ros::Rate loop_rate(30);
 
